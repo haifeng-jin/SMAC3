@@ -182,34 +182,43 @@ class ModelTrainer:
 
 def cnn(params, data):
     if constant.LIMIT_MEMORY:
-        config = tf.ConfigProto(log_device_placement=True, allow_soft_placement=True)
+        config = tf.ConfigProto(allow_soft_placement=True)
         config.gpu_options.allow_growth = True
         sess = tf.Session(config=config)
         init = tf.global_variables_initializer()
         sess.run(init)
         backend.set_session(sess)
 
-    w = list(map(lambda x: int(x), params[:3]))
-    d = params[3:6]
-    r = params[6:]
+    w = list(map(lambda x: int(x), params[:6]))
+    d = params[6:12]
+    r = params[12:]
 
     x_train, y_train, x_test, y_test = data
 
+    conv = Conv2D
+    pool = MaxPooling2D
     # Input image dimensions.
     input_shape = x_train.shape[1:]
     input_tensor = output_tensor = Input(shape=input_shape)
-    for i in range(3):
-        output_tensor = Conv2D(filters=w[i],
-                               kernel_size=3,
-                               kernel_regularizer=l2(r[i]),
-                               kernel_initializer='he_normal')(output_tensor)
+    for i in range(4):
+        output_tensor = conv(32,
+                             kernel_size=3,
+                             padding='same',
+                             kernel_regularizer=l2(r[i]),
+                             kernel_initializer='he_normal',
+                             activation='linear')(output_tensor)
         output_tensor = BatchNormalization()(output_tensor)
         output_tensor = Activation('relu')(output_tensor)
-        output_tensor = Dropout(d[i])(output_tensor)
-        output_tensor = MaxPooling2D()(output_tensor)
+        output_tensor = Dropout(constant.CONV_DROPOUT_RATE)(output_tensor)
+        if i != 3:
+            output_tensor = pool(padding='same')(output_tensor)
 
     output_tensor = Flatten()(output_tensor)
-    output_tensor = Dense(10, kernel_initializer='he_normal', activation='softmax')(output_tensor)
+    output_tensor = Dense(w[4], kernel_initializer='he_normal', activation='relu')(output_tensor)
+    output_tensor = Dropout(d[4])(output_tensor)
+    output_tensor = Dense(w[5], kernel_initializer='he_normal', activation='relu')(output_tensor)
+    output_tensor = Dropout(d[5])(output_tensor)
+    output_tensor = Dense(10, activation='softmax')(output_tensor)
 
     model = Model(input_tensor, output_tensor)
 

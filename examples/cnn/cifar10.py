@@ -49,10 +49,10 @@ if __name__ == '__main__':
     select_gpu()
     logging.basicConfig(level=20)  # 10: debug; 20: info
     x, cost, _ = fmin_smac(func=run,  # function
-                           x0=[50, 50, 50, 0.5, 0.5, 0.5, 0.01, 0.01, 0.01],  # default configuration
-                           bounds=[(10, 500), (10, 500), (10, 500),
-                                   (0, 1), (0, 1), (0, 1),
-                                   (0.0001, 0.1), (0.0001, 0.1), (0.0001, 0.1)],  # limits
+                           x0=[50, 50, 50, 50, 50, 50, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.01, 0.01, 0.01, 0.01],  # default configuration
+                           bounds=[(10, 500), (10, 500), (10, 500), (10, 500), (10, 500), (10, 500),
+                                   (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1),
+                                   (0.0001, 0.1), (0.0001, 0.1), (0.0001, 0.1), (0.0001, 0.1)],  # limits
                            maxfun=500,  # maximum number of evaluations
                            rng=3)  # random seed
     print("Optimum at {} with cost of {}".format(x, cost))
