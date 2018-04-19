@@ -26,3 +26,5 @@ target_algo_runs.json
 #eclipse files
 .pydevproject 
 .project
+
+smac3-output*
