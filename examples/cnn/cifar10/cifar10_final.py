@@ -2,8 +2,9 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
 from examples.cnn.cifar10.cifar10 import get_data
-from examples.cnn.cnn import cnn
+from examples.cnn.cnn import cnn, select_gpu
 
+select_gpu()
 params = [23.60354983076994, 490.14152186740233, 111.68555087043214, 129.74493665913906, 423.8734676989647,
           198.3610011114455,
           0.16961793785478674, 0.49727464470661287, 0.7059263168631477, 0.2954049199450184, 0.2403409396251418,
