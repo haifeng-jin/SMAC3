@@ -200,6 +200,7 @@ def cnn(params, data):
     # Input image dimensions.
     input_shape = x_train.shape[1:]
     input_tensor = output_tensor = Input(shape=input_shape)
+    print(input_shape)
     for i in range(4):
         output_tensor = conv(32,
                              kernel_size=3,
