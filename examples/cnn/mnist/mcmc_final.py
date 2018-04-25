@@ -1,50 +1,51 @@
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
-from examples.cnn.cifar10.cifar10 import get_data
+from examples.cnn.mnist.mnist import get_data
 from examples.cnn.cnn import cnn, select_gpu
 
 """
-Best result: 0.238800
-Job-id: 20005
+Best result: 0.015133
+Job-id: 0
 Parameters: 
 name: "width1"
-int_val: 110
+int_val: 10
 name: "width2"
-int_val: 18
+int_val: 10
 name: "width3"
-int_val: 87
+int_val: 10
 name: "width4"
-int_val: 53
+int_val: 10
 name: "width5"
-int_val: 97
+int_val: 10
 name: "width6"
-int_val: 275
+int_val: 10
 name: "dropout1"
 dbl_val: 0.05
 name: "dropout2"
-dbl_val: 0.446227673193
+dbl_val: 0.05
 name: "dropout3"
-dbl_val: 0.149082967174
+dbl_val: 0.05
 name: "dropout4"
-dbl_val: 0.247763545073
+dbl_val: 0.05
 name: "dropout5"
-dbl_val: 0.0716215130478
+dbl_val: 0.05
 name: "dropout6"
 dbl_val: 0.05
 name: "regularizer1"
 dbl_val: 0.0001
 name: "regularizer2"
-dbl_val: 0.000145183924707
+dbl_val: 0.0001
 name: "regularizer3"
-dbl_val: 0.00139104840186
+dbl_val: 0.0001
 name: "regularizer4"
-dbl_val: 0.00900573513475
+dbl_val: 0.0001
 """
+
 select_gpu()
-params = [110, 18, 87, 53, 97, 275,
-          0.05, 0.446227673193, 0.149082967174, 0.247763545073, 0.0716215130478, 0.05,
-          0.05, 0.0001, 0.000145183924707, 0.00139104840186, 0.00900573513475]
+params = [10, 10, 10, 10, 10, 10,
+          0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+          0.0001, 0.0001, 0.0001, 0.0001]
 
 x_train, y_train, x_test, y_test = get_data()
 X = np.concatenate((x_train, x_test))

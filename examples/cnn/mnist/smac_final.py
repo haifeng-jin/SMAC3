@@ -1,14 +1,26 @@
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
-from examples.cnn.cifar10.cifar10 import get_data
+from examples.cnn.mnist.mnist import get_data
 from examples.cnn.cnn import cnn, select_gpu
 
 select_gpu()
-params = [23.60354983076994, 490.14152186740233, 111.68555087043214, 129.74493665913906, 423.8734676989647,
-          198.3610011114455,
-          0.16961793785478674, 0.49727464470661287, 0.7059263168631477, 0.2954049199450184, 0.2403409396251418,
-          0.3692255461469338, 0.03459834711189307, 0.04745673246005165, 0.06077110312934916, 0.03008818154171109]
+params = [1.39895725e+02,
+          1.48324395e+02,
+          4.55600341e+01,
+          1.49942994e+02,
+          1.83796006e+02,
+          1.31789931e+01,
+          7.32852875e-01,
+          5.67360193e-03,
+          5.33543975e-01,
+          4.48722440e-01,
+          6.34694890e-01,
+          3.81097889e-01,
+          4.63393141e-02,
+          5.29944498e-02,
+          1.96118275e-02,
+          8.78378662e-02]
 
 x_train, y_train, x_test, y_test = get_data()
 X = np.concatenate((x_train, x_test))
