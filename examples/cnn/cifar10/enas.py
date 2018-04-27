@@ -1,3 +1,4 @@
+import GPUtil
 import numpy as np
 from keras import Input, Model
 from keras.layers import SeparableConv2D, Conv2D, MaxPooling2D, Flatten, Dense, Add
