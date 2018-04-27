@@ -11,9 +11,8 @@ from keras import backend as K, backend
 import GPUtil
 from keras import Input, Model
 from keras.callbacks import Callback, LearningRateScheduler, ReduceLROnPlateau
-from keras.datasets import cifar10
-from keras.layers import Conv2D, BatchNormalization, Dropout, Flatten, Dense, Activation, MaxPooling2D
-from keras.losses import categorical_crossentropy
+from keras.layers import Conv2D, BatchNormalization, Dropout, Flatten, Dense, Activation, MaxPooling2D, Embedding
+from keras.losses import categorical_crossentropy, binary_crossentropy
 from keras.optimizers import Adam
 from keras.regularizers import l2
 
@@ -107,9 +106,12 @@ class ModelTrainer:
         verbose: verbosity mode
     """
 
-    def __init__(self, model, x_train, y_train, x_test, y_test, verbose):
+    def __init__(self, model, x_train, y_train, x_test, y_test, verbose, binary=False, augment=True):
         """Init ModelTrainer with model, x_train, y_train, x_test, y_test, verbose"""
-        model.compile(loss=categorical_crossentropy,
+        loss = categorical_crossentropy
+        if binary:
+            loss = binary_crossentropy
+        model.compile(loss=loss,
                       optimizer=Adam(lr=lr_schedule(0)),
                       metrics=['accuracy'])
         self.model = model
@@ -118,7 +120,8 @@ class ModelTrainer:
         self.x_test = x_test
         self.y_test = y_test
         self.verbose = verbose
-        if constant.DATA_AUGMENTATION:
+        self.augment = augment
+        if augment:
             self.datagen = ImageDataGenerator(
                 # set input mean to 0 over the dataset
                 featurewise_center=False,
@@ -160,7 +163,7 @@ class ModelTrainer:
 
         callbacks = [terminator, lr_scheduler, lr_reducer]
         try:
-            if constant.DATA_AUGMENTATION:
+            if self.augment:
                 flow = self.datagen.flow(self.x_train, self.y_train, batch_size)
                 self.model.fit_generator(flow,
                                          epochs=constant.MAX_ITER_NUM,
@@ -180,7 +183,7 @@ class ModelTrainer:
                 print(e.message)
 
 
-def cnn(params, data):
+def cnn(params, data, conv=Conv2D, pool=MaxPooling2D, embed=False, binary=False):
     if constant.LIMIT_MEMORY:
         config = tf.ConfigProto(allow_soft_placement=True)
         config.gpu_options.allow_growth = True
@@ -195,12 +198,11 @@ def cnn(params, data):
 
     x_train, y_train, x_test, y_test = data
 
-    conv = Conv2D
-    pool = MaxPooling2D
     # Input image dimensions.
     input_shape = x_train.shape[1:]
     input_tensor = output_tensor = Input(shape=input_shape)
-    print(input_shape)
+    if embed:
+        output_tensor = Embedding(5000, 50)(output_tensor)
     for i in range(4):
         output_tensor = conv(32,
                              kernel_size=3,
@@ -219,12 +221,15 @@ def cnn(params, data):
     output_tensor = Dropout(d[4])(output_tensor)
     output_tensor = Dense(w[5], kernel_initializer='he_normal', activation='relu')(output_tensor)
     output_tensor = Dropout(d[5])(output_tensor)
-    output_tensor = Dense(10, activation='softmax')(output_tensor)
+    if binary:
+        output_tensor = Dense(1, activation='sigmoid')(output_tensor)
+    else:
+        output_tensor = Dense(10, activation='softmax')(output_tensor)
 
     model = Model(input_tensor, output_tensor)
 
     x_train_new, x_val, y_train_new, y_val = train_test_split(x_train, y_train, test_size=0.25, random_state=42)
-    ModelTrainer(model, x_train_new, y_train_new, x_val, y_val, False).train_model()
+    ModelTrainer(model, x_train_new, y_train_new, x_val, y_val, False, binary, not embed).train_model()
     loss, accuracy = model.evaluate(x_val, y_val, verbose=False)
 
     print(accuracy)
