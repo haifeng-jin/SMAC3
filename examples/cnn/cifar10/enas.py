@@ -12,7 +12,7 @@ from examples.cnn.cifar10.cifar10 import get_data
 from examples.cnn.cnn import ModelTrainer
 
 
-def cnn(x_train, y_train, x_test, y_test):
+def get_model(x_train):
     input_shape = x_train.shape[1:]
     input_tensor = output_tensor = Input(shape=input_shape)
     output_tensor = SeparableConv2D(256,
@@ -223,8 +223,19 @@ def cnn(x_train, y_train, x_test, y_test):
     output_tensor = GlobalAveragePooling2D()(output_tensor)
     output_tensor = Dense(10, activation='softmax')(output_tensor)
 
-    model = Model(input_tensor, output_tensor)
+    return Model(input_tensor, output_tensor)
 
+
+def reset_weights(model):
+    """Reset weights with a new model"""
+    session = backend.get_session()
+    for layer in model.layers:
+        if hasattr(layer, 'kernel_initializer'):
+            layer.kernel.initializer.run(session=session)
+
+
+def train_model(model, x_train, y_train, x_test, y_test):
+    # reset_weights(model)
     ModelTrainer(model, x_train, y_train, x_test, y_test, False).train_model()
     loss, accuracy = model.evaluate(x_test, y_test, verbose=True)
 
@@ -237,12 +248,13 @@ def select_gpu():
     try:
         # Get the first available GPU
         DEVICE_ID_LIST = GPUtil.getFirstAvailable()
-        DEVICE_ID = DEVICE_ID_LIST[0] # grab first element from list
+        DEVICE_ID = DEVICE_ID_LIST[0]  # grab first element from list
 
         # Set CUDA_VISIBLE_DEVICES to mask out all other GPUs than the first available device id
         os.environ["CUDA_VISIBLE_DEVICES"] = str(DEVICE_ID)
     except EnvironmentError:
         print("GPU not found")
+
 
 select_gpu()
 
@@ -259,6 +271,9 @@ Y = np.concatenate((y_train, y_test))
 k_fold = StratifiedKFold(n_splits=10, shuffle=False, random_state=7)
 ret = []
 y_stub = np.random.randint(0, 10, X.shape[0])
+cnn_model = get_model(X)
+weights = cnn_model.get_weights()
 for train, test in k_fold.split(X, y_stub):
-    ret.append(cnn(X[train], Y[train], X[test], Y[test]))
+    cnn_model.set_weights(weights)
+    ret.append(train_model(cnn_model, X[train], Y[train], X[test], Y[test]))
 print(np.array(ret))
