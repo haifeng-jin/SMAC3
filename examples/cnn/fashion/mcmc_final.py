@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
-from examples.cnn.mnist.mnist import get_data
+from examples.cnn.fashion.fashion import get_data
 from examples.cnn.cnn import cnn, select_gpu
 
 """
