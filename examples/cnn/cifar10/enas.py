@@ -236,7 +236,7 @@ def reset_weights(model):
 
 def train_model(model, x_train, y_train, x_test, y_test):
     # reset_weights(model)
-    ModelTrainer(model, x_train, y_train, x_test, y_test, False).train_model()
+    ModelTrainer(model, x_train, y_train, x_test, y_test, True).train_model()
     loss, accuracy = model.evaluate(x_test, y_test, verbose=True)
 
     print(accuracy)
@@ -275,5 +275,6 @@ cnn_model = get_model(X)
 weights = cnn_model.get_weights()
 for train, test in k_fold.split(X, y_stub):
     cnn_model.set_weights(weights)
+    print("Training started")
     ret.append(train_model(cnn_model, X[train], Y[train], X[test], Y[test]))
 print(np.array(ret))
