@@ -1,7 +1,8 @@
+import os
 from examples.cnn.fashion.fashion import get_data
 from examples.cnn.cnn import cnn, select_gpu
 
-select_gpu()
+os.environ["CUDA_VISIBLE_DEVICES"] = str(0)
 for width in [64, 128, 256]:
     for dropout in [0.25, 0.5]:
         for regularizer in [0.01, 0.001]:
