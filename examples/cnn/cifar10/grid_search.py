@@ -1,6 +1,7 @@
 from examples.cnn.cifar10.cifar10 import get_data
-from examples.cnn.cnn import cnn
+from examples.cnn.cnn import cnn, select_gpu
 
+select_gpu()
 for width in [64, 128, 256]:
     for dropout in [0.25, 0.5]:
         for regularizer in [0.01, 0.001]:
